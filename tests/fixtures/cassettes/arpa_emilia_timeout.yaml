@@ -1,0 +1,16 @@
+# respx stub — timeout scenario (simulated via respx side_effect)
+# Per RESEARCH Q4 resolution: respx raises httpx.TimeoutException for timeouts
+# The test uses respx.mock with side_effect=httpx.TimeoutException
+# This file documents the scenario for D-27 requirement tracking.
+# marker: respx-stub
+# record_mode: none
+version: 1
+interactions:
+  - request:
+      method: GET
+      url: https://dati-simc.arpae.it/opendata/osservati/meteo/realtime/realtime.jsonl
+    response:
+      status: 0
+      headers: {}
+      body: ""
+      exception: "httpx.TimeoutException"

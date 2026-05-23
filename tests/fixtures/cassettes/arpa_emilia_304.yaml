@@ -1,0 +1,15 @@
+# respx stub — 304 Not Modified ETag scenario
+# marker: respx-stub
+# record_mode: none
+version: 1
+interactions:
+  - request:
+      method: GET
+      url: https://dati-simc.arpae.it/opendata/osservati/meteo/realtime/realtime.jsonl
+      headers:
+        If-None-Match: '"etag-happy-abc123"'
+    response:
+      status: 304
+      headers:
+        ETag: '"etag-happy-abc123"'
+      body: ""

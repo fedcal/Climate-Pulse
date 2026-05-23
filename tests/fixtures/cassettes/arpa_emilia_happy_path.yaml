@@ -1,0 +1,22 @@
+# respx stub — hand-authored from verified ARPAE SIMC realtime.jsonl schema
+# Source: dati-simc.arpae.it/opendata/osservati/meteo/realtime/realtime.jsonl
+# Per RESEARCH Q4 resolution: using respx for all async httpx mocks in Phase 1
+#
+# marker: respx-stub
+# record_mode: none  (kept for vcrpy naming compatibility per D-27)
+version: 1
+interactions:
+  - request:
+      method: GET
+      url: https://dati-simc.arpae.it/opendata/osservati/meteo/realtime/realtime.jsonl
+      headers:
+        User-Agent: ClimatePulse
+    response:
+      status: 200
+      headers:
+        Content-Type: application/x-ndjson
+        ETag: '"etag-happy-abc123"'
+      body: |
+        {"version":1,"network":"agrmet","ident":null,"lon":11.1234,"lat":44.5678,"date":"2026-05-23T03:15:00Z","data":[{"level":[105,0,0,0],"timerange":[0,0,0],"vars":{"B12101":{"v":285.65,"a":{"B33007":70}},"B13003":{"v":78.0,"a":{"B33007":70}},"B13011":{"v":null,"a":{"B33007":70}},"B07030":{"v":45.0},"B01019":{"v":"Carpineti"},"B01194":{"v":"agrmet"},"B05001":{"v":44.5678},"B06001":{"v":11.1234}}}]}
+        {"version":1,"network":"agrmet","ident":null,"lon":11.2345,"lat":44.6789,"date":"2026-05-23T03:15:00Z","data":[{"level":[105,0,0,0],"timerange":[0,0,0],"vars":{"B12101":{"v":283.15,"a":{"B33007":70}},"B13003":{"v":65.0,"a":{"B33007":70}},"B11001":{"v":180.0,"a":{"B33007":70}},"B11002":{"v":5.2,"a":{"B33007":70}},"B07030":{"v":120.0},"B01019":{"v":"Casalecchio"},"B01194":{"v":"agrmet"},"B05001":{"v":44.6789},"B06001":{"v":11.2345}}}]}
+        {"version":1,"network":"agrmet","ident":null,"lon":11.3456,"lat":44.7890,"date":"2026-05-23T03:15:00Z","data":[{"level":[105,0,0,0],"timerange":[0,0,0],"vars":{"B12101":{"v":290.0,"a":{"B33007":75}},"B13003":{"v":55.0,"a":{"B33007":75}},"B13011":{"v":1.2,"a":{"B33007":75}},"B07030":{"v":30.0},"B01019":{"v":"Marzabotto"},"B01194":{"v":"agrmet"},"B05001":{"v":44.7890},"B06001":{"v":11.3456}}}]}

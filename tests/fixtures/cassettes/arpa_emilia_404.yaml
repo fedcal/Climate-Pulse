@@ -1,0 +1,13 @@
+# respx stub — 404 Not Found scenario (storico path)
+# marker: respx-stub
+# record_mode: none
+version: 1
+interactions:
+  - request:
+      method: GET
+      url: https://dati-simc.arpae.it/opendata/osservati/meteo/storico/9999-99.json.gz
+    response:
+      status: 404
+      headers:
+        Content-Type: text/plain
+      body: "Not Found"
