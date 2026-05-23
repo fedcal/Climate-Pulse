@@ -1,8 +1,8 @@
 # Climate Pulse
 
-[![CI](https://github.com/federicocalo/climate-pulse/actions/workflows/ci.yml/badge.svg)](https://github.com/federicocalo/climate-pulse/actions/workflows/ci.yml)
-[![Docs](https://github.com/federicocalo/climate-pulse/actions/workflows/docs.yml/badge.svg)](https://federicocalo.github.io/climate-pulse)
-[![Coverage](https://img.shields.io/badge/coverage-80%25-brightgreen)](https://github.com/federicocalo/climate-pulse)
+[![CI](https://github.com/fedcal/Climate-Pulse/actions/workflows/ci.yml/badge.svg)](https://github.com/fedcal/Climate-Pulse/actions/workflows/ci.yml)
+[![Docs](https://github.com/fedcal/Climate-Pulse/actions/workflows/docs.yml/badge.svg)](https://fedcal.github.io/Climate-Pulse)
+[![Coverage](https://img.shields.io/badge/coverage-80%25-brightgreen)](https://github.com/fedcal/Climate-Pulse)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Climate Pulse is an open-source pipeline that aggregates meteorological data from European public
@@ -12,15 +12,15 @@ Angular dashboard with an interactive map. It is designed for researchers, data 
 open-data communities, and SMEs (agriculture, renewable energy) who need structured access to
 historical weather data without paying commercial API fees.
 
-**Documentation:** [https://federicocalo.github.io/climate-pulse](https://federicocalo.github.io/climate-pulse)
+**Documentation:** [https://fedcal.github.io/Climate-Pulse](https://fedcal.github.io/Climate-Pulse)
 
 ## Quickstart
 
-See the [Quickstart Guide](https://federicocalo.github.io/climate-pulse/quickstart/) for full
+See the [Quickstart Guide](https://fedcal.github.io/Climate-Pulse/quickstart/) for full
 instructions including `docker compose up`, backfill CLI, and data verification via psql.
 
 ```bash
-git clone https://github.com/federicocalo/climate-pulse
+git clone https://github.com/fedcal/Climate-Pulse
 cd climate-pulse
 cp .env.example .env
 docker compose up -d

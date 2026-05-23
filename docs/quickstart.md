@@ -12,7 +12,7 @@ first 7 days of ARPA Emilia-Romagna data, and verifying that rows landed in Time
 ## Clone and Start
 
 ```bash
-git clone https://github.com/federicocalo/climate-pulse
+git clone https://github.com/fedcal/Climate-Pulse
 cd climate-pulse
 cp .env.example .env
 docker compose up -d

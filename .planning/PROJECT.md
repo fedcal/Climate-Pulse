@@ -83,6 +83,7 @@ Climate Pulse è una pipeline open-source che aggrega dati meteorologici da font
 | Self-hosted Docker Compose only (v1.0) | Zero cloud budget, deploy comunità open-data, single-node sufficient | — Pending |
 | Public API senza autenticazione (rate-limit IP-based) | Filosofia open-data, API key opzionale solo in v1.0 | — Pending |
 | Docs su GitHub Pages fin dalla v0.1 (MkDocs Material + GH Action) | Progetto open-source vive anche di docs scoperte da Google — niente "docs dopo", parte subito | ✓ Good |
+| Repo: github.com/fedcal/Climate-Pulse — Docs: fedcal.github.io/Climate-Pulse | Username GitHub effettivo è `fedcal` (CONTEXT D-01/D-02 originali citavano `federicocalo` per coerenza col dominio personale ma sono stati corretti durante execute Phase 1) | ✓ Good |
 | Footer `federicocalo.dev` su dashboard + docs | Attribuzione autore richiesta in ogni release; deve essere in ogni pagina (dashboard Angular layout + MkDocs theme footer) | ✓ Good |
 
 ## Evolution

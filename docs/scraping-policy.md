@@ -9,7 +9,7 @@ respectful, well-identified crawler that does not impose unnecessary load on pub
 Every HTTP request made by Climate Pulse includes a descriptive `User-Agent` header:
 
 ```
-ClimatePulse/{version} (+https://github.com/federicocalo/climate-pulse; contact: fedcal01@gmail.com)
+ClimatePulse/{version} (+https://github.com/fedcal/Climate-Pulse; contact: fedcal01@gmail.com)
 ```
 
 This string identifies the crawler, links to the public source repository, and provides a
@@ -55,4 +55,4 @@ policy — please contact us at **[fedcal01@gmail.com](mailto:fedcal01@gmail.com
 investigate and adjust the rate limit or schedule immediately.
 
 You can also open an issue at
-[github.com/federicocalo/climate-pulse/issues](https://github.com/federicocalo/climate-pulse/issues).
+[github.com/fedcal/Climate-Pulse/issues](https://github.com/fedcal/Climate-Pulse/issues).
