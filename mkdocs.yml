@@ -1,0 +1,28 @@
+site_name: Climate Pulse
+site_url: https://federicocalo.github.io/climate-pulse
+repo_url: https://github.com/federicocalo/climate-pulse
+repo_name: federicocalo/climate-pulse
+
+copyright: "Climate Pulse · MIT License · <a href='https://federicocalo.dev'>federicocalo.dev</a>"
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: blue
+      accent: light-blue
+  features:
+    - navigation.sections
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Quickstart: quickstart.md
+  - Scraping Policy: scraping-policy.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [packages/core]
