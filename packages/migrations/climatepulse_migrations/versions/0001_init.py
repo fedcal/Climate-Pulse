@@ -136,7 +136,7 @@ def upgrade() -> None:
         sa.Column("lon", sa.Double(), nullable=False),
         sa.Column(
             "elevation_m",
-            sa.Real(),
+            sa.REAL(),
             nullable=True,
             comment="Station elevation in metres above sea level",
         ),
@@ -273,13 +273,13 @@ def upgrade() -> None:
         ),
         sa.Column(
             "lat",
-            sa.Real(),
+            sa.REAL(),
             nullable=False,
             comment="Latitude in decimal degrees",
         ),
         sa.Column(
             "lon",
-            sa.Real(),
+            sa.REAL(),
             nullable=False,
             comment="Longitude in decimal degrees",
         ),
