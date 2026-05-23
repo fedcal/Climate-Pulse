@@ -119,6 +119,8 @@ async def test_run_backfill_splits_by_day():
     stub_writer = MagicMock()
     stub_writer.write_batch = stub_write_batch
 
+    mock_ensure = AsyncMock(return_value=({}, {}, {}))
+
     with (
         patch(
             "climatepulse_worker.cli.backfill.get_adapter",
@@ -130,7 +132,7 @@ async def test_run_backfill_splits_by_day():
         ),
         patch(
             "climatepulse_worker.cli.backfill._ensure_metadata",
-            new_callable=AsyncMock,
+            mock_ensure,
         ),
     ):
         await run_backfill(
@@ -179,6 +181,8 @@ async def test_run_backfill_idempotent_second_run_zero_rows():
     stub_writer = MagicMock()
     stub_writer.write_batch = idempotent_write_batch
 
+    mock_ensure = AsyncMock(return_value=({}, {}, {}))
+
     with (
         patch(
             "climatepulse_worker.cli.backfill.get_adapter",
@@ -190,7 +194,7 @@ async def test_run_backfill_idempotent_second_run_zero_rows():
         ),
         patch(
             "climatepulse_worker.cli.backfill._ensure_metadata",
-            new_callable=AsyncMock,
+            mock_ensure,
         ),
     ):
         first_total = await run_backfill(
