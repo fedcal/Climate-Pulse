@@ -31,7 +31,13 @@ End-to-end multi-source meteo pipeline: aggregate public EU sources (ARPA, ECMWF
   3. The MkDocs Material documentation site is live on GitHub Pages at the project URL, auto-deployed on every push to `main`, and every page shows a `federicocalo.dev` clickable footer.
   4. A reader of the docs can follow the quickstart page to bring up the stack and run their first `psql` query against the hypertable.
   5. CI (GitHub Actions) blocks any PR that breaks pytest, ruff, pyright, or leaks a secret detected by gitleaks.
-**Plans:** TBD
+**Plans:** 5 plans
+Plans:
+- [ ] 01-01-PLAN.md — uv workspace scaffold + MkDocs Material site live on GitHub Pages + CI gates (DOC-01/02/03/05 + OPS-07/08/09)
+- [ ] 01-02-PLAN.md — Alembic migrations + BOTH TimescaleDB hypertables (D-23) + CAGGs + compression + retention + testcontainers integration tests (STO-01..06)
+- [ ] 01-03-PLAN.md — Core ingestion machinery: WeatherSourceAdapter ABC + PoliteHttpClient + WMO Normalizer + DST-safe timezone + IdempotentWriter dual-hypertable routing + per-source health metric (ING-01/02/09/10/12/14)
+- [ ] 01-04-PLAN.md — ARPA Emilia-Romagna adapter + ECMWF Open Data adapter (EU bbox + cfgrib) + Backfill CLI + 5 VCR cassettes (ING-03/04/13)
+- [ ] 01-05-PLAN.md — Celery worker + dedicated singleton Beat + 4 queues + FastAPI minimal /healthz + /readyz + Docker Compose + REQUIREMENTS/ROADMAP D-14 migration + acceptance demo (ING-11 + OPS-01 + API-10)
 **UI hint:** no
 
 ### Phase 2: Public REST API

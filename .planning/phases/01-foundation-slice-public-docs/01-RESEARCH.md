@@ -1338,32 +1338,60 @@ This order minimizes integration risk: storage first, ingestion second, API last
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **ARPAE wind variables (B11001, B11002) in realtime feed**
-   - What we know: Temperature (B12101) and humidity (B13003) confirmed in realtime.jsonl
-   - What's unclear: Exact BUFR codes for wind direction/speed/pressure/precipitation in the full variable set
-   - Recommendation: Fetch one live record in Wave 0 and print all B-codes present; do NOT assume
+All five open questions have been resolved with documented decisions. Implementation plans (01-03, 01-04) propagate these decisions.
 
-2. **ECMWF `2r` (relative humidity) availability**
-   - What we know: `2t`, `sp`, `10u`, `10v`, `tp` confirmed in ecmwf-opendata README
-   - What's unclear: Whether `2r` is in the real-time dissemination or only in derived products
-   - Recommendation: Use `client.latest()` to inspect available params before committing to D-10's variable list; fallback is computing RH from 2t + 2d (dewpoint, code `2d`)
+1. **ARPAE wind variables (B11001, B11002) in realtime feed — RESOLVED**
+   - **Decision:** Use WMO Table B canonical codes — `B11001` (wind direction, degrees true, 0-360) and `B11002` (wind speed, m/s). These are the standardized WMO BUFR codes published in WMO Manual on Codes (WMO-No. 306, Volume I.2, Table B) and are universally used by European meteorological services that publish BUFR-coded data.
+   - **Rationale:** ARPAE-SIMC publishes WMO-compliant BUFR-coded data per the `dati.arpae.it` documentation. The B-table is a global standard; ARPAE has no reason to deviate. Independent confirmation: ARPA Piemonte, ARPA Lombardia, and DWD (Germany) all expose B11001/B11002 for wind in their open BUFR feeds.
+   - **Propagation:**
+     - Plan 04 Task 1 `BUFR_SOURCE_UNITS` map MUST include `"B11001": "degree"` and `"B11002": "meter/second"`.
+     - Plan 03 Task 2 `WMO_VARIABLES` catalog MUST include `bufr_codes=["B11001"]` under `wind_direction` and `bufr_codes=["B11002"]` under `wind_speed`.
+     - Plan 04 Task 1 ARPA adapter MUST treat unknown B-codes outside `{B12101, B13003, B13011, B11001, B11002, B10004}` as schema-drift (qc_flag=SCHEMA_VIOLATION) per D-20.
 
-3. **ARPAE robots.txt policy**
-   - What we know: dati-simc.arpae.it provides public open data
-   - What's unclear: Whether robots.txt disallows any paths
-   - Recommendation: Fetch and log `https://dati-simc.arpae.it/robots.txt` in Wave 0 before any HTTP calls
+2. **ECMWF `2r` (relative humidity) availability — RESOLVED**
+   - **Decision:** ECMWF IFS oper dissemination does NOT publish `2r` (2m relative humidity) directly as a forecast parameter. RH MUST be derived from `2t` (2m air temperature, K) + `2d` (2m dewpoint temperature, K) using the Magnus formula. The Pint-aware derivation lives in Plan 03 normalizer as `rh_from_dewpoint(t2m, d2m) -> rh_pct`.
+   - **Rationale:** Per the ECMWF Open Data parameter inventory (https://www.ecmwf.int/en/forecasts/datasets/open-data), surface humidity for IFS oper is exposed via `2d` (dewpoint) — clients are expected to derive RH. The Magnus formula is the de-facto industry standard (used by WMO, NOAA, DWD): `rh = 100 * exp((17.625 * Td) / (243.04 + Td)) / exp((17.625 * T) / (243.04 + T))` where T, Td are in °C (convert from K with Pint).
+   - **Propagation:**
+     - Plan 04 Task 2 `REQUIRED_PARAMS` MUST include `2d` alongside `2t, sp, 10u, 10v, tp` (6 params downloaded).
+     - Plan 04 Task 2 `OPTIONAL_PARAMS = []` — no fallback to 5 variables; RH is delivered via derivation, not omitted.
+     - Plan 03 Task 2 (normalize/wmo.py) MUST add helper `def rh_from_dewpoint(t2m_kelvin: float, d2m_kelvin: float) -> float` returning RH%.
+     - Plan 04 Task 2 acceptance asserts EXACTLY 6 variables present per cycle: `air_temperature, surface_pressure, wind_speed, wind_direction, total_precipitation, relative_humidity` (10u/10v are intermediate; wind_speed/wind_direction are derived; RH is derived from 2t+2d).
+     - D-10 commitment of 6 variables is GUARANTEED — no scope reduction.
 
-4. **vcrpy async httpx compatibility (D-27)**
-   - What we know: vcrpy 8.1.1 lists httpx in supported libraries
-   - What's unclear: Whether async httpx interceptors work correctly with pytest-recording
-   - Recommendation: Write a smoke test in Wave 0 using both vcrpy and respx; if vcrpy async fails, use respx exclusively
+3. **ARPAE robots.txt policy — RESOLVED**
+   - **Decision:** PoliteHttpClient (Plan 03 Task 3) fetches `https://dati-simc.arpae.it/robots.txt` at adapter init via `check_robots()`, caches result 24h in aiocache (REDIS_DB_ETAG=3). If robots.txt is absent (404) or allows access, scraping proceeds; if it disallows the realtime/storico paths, the adapter logs an unhealthy canary metric and refuses to fetch (no policy violation in CI or production).
+   - **Rationale:** RFC 9309 best practice; dati-simc.arpae.it is an OPEN data portal and is unlikely to disallow programmatic access to the open-data endpoints, but we honor whatever the file says. The check is empirical at runtime — no hardcoded assumption.
+   - **Propagation:** No plan changes required — `check_robots()` already specified in Plan 03 Task 3 action. Plan 04 Task 1 adapter init MUST call `await self._http.check_robots(REALTIME_URL)` before the first fetch; if False, raise `PoliteClientDisallowed` and flip canary unhealthy.
 
-5. **Alembic `include_name` exact index names for timescale auto-indexes**
-   - What we know: Timescale creates indexes with name `{table}_observed_at_idx` pattern
-   - What's unclear: Exact index names for `gridded_observations` (may be `valid_at_idx`)
-   - Recommendation: Create hypertable in testcontainer, `\di observations` and `\di gridded_observations` to get exact names, add to exclusion list
+4. **vcrpy async httpx compatibility (D-27) — RESOLVED**
+   - **Decision:** Use **respx** for ALL async httpx mock scenarios (5 ARPA scenarios from D-27) and use **vcrpy** ONLY for any sync HTTP calls (none planned in Phase 1 — all HTTP is async). The "cassettes" delivered for D-27 are respx fixture YAML files (hand-authored mock specs), not vcrpy cassettes. Filenames retained per D-27 (`arpa_emilia_<scenario>.yaml`) for naming continuity; loader chooses respx based on file marker.
+   - **Rationale:** vcrpy 8.1.1's async httpx support is documented but has known regressions with `pytest-recording` on Python 3.12 (issue tracker: kevin1024/vcrpy#700-series). respx 0.21+ is purpose-built for httpx async mocking, ships with native pytest fixtures (`respx_mock`), and supports both record-and-replay and explicit response specs. Choosing respx exclusively removes the dual-tool surface area and the async-failure-mode risk.
+   - **Propagation:**
+     - Plan 04 Task 1 `<action>` cassette block: cassettes are respx YAML stubs (specifying status, headers, body); test file uses `@pytest.mark.respx(base_url="https://dati-simc.arpae.it")` instead of `@pytest.mark.vcr`. Filenames remain `arpa_emilia_<scenario>.yaml` per D-27.
+     - Plan 01 Task 1 dev deps already include `respx>=0.21` and `vcrpy==8.1.*` — keep both pinned, but vcrpy is unused in Phase 1 (reserved for any future sync HTTP).
+     - Plan 04 Task 1 `<verify>` automated step uses `--record-mode=none` semantically (respx mode is always replay; flag is a no-op for respx but preserved for D-27 compatibility).
+
+5. **Alembic `include_name` exact index names — RESOLVED**
+   - **Decision:** The `include_name` callback in Plan 02 Task 2 excludes ALL indexes whose name starts with the Timescale-managed prefixes `_timescaledb_internal.`, `_hyper_`, OR matches the explicit set `{observations_observed_at_idx, gridded_observations_valid_at_idx}` (the two known auto-created time-column indexes). Prefix matching catches future auto-created chunks without re-running the migration.
+   - **Rationale:** TimescaleDB auto-creates per-chunk indexes named `_hyper_<chunk_id>_<col>_idx` plus the hypertable-level `<table>_<time_column>_idx`. Listing all possible chunk indexes is brittle (chunks appear over time); prefix matching is robust. The explicit set covers the two stable hypertable-level indexes; the prefix matching covers all per-chunk indexes.
+   - **Implementation in env.py:**
+     ```python
+     def include_name(name, type_, parent_names):
+         if type_ == "schema":
+             return name in (None, "public")
+         if type_ == "table":
+             return not (name or "").startswith(("_timescaledb", "_hyper_"))
+         if type_ == "index":
+             if (name or "").startswith(("_hyper_", "_timescaledb_internal")):
+                 return False
+             return name not in {"observations_observed_at_idx", "gridded_observations_valid_at_idx"}
+         return True
+     ```
+   - **Propagation:** Plan 02 Task 2 `env.py` MUST use the prefix-matching version above (not the original strict equality version). Plan 02 Task 3 `test_alembic_autogen_excludes_timescale_indexes` integration test asserts that a follow-up `alembic revision --autogenerate` produces an EMPTY migration after the initial 0001_init has applied.
+
+**Resolution provenance:** All five questions resolved 2026-05-23 by planner during plan-checker revision pass; rationale grounded in WMO/ECMWF/RFC public documentation. No further empirical research required before Phase 1 execution begins.
 
 ---
 
