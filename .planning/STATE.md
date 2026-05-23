@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Release
-status: Not started (roadmap just initialized)
-last_updated: "2026-05-23T10:18:35.846Z"
+status: executing
+last_updated: "2026-05-23T10:23:18.455Z"
 progress:
   total_phases: 1
   completed_phases: 0
@@ -20,16 +20,19 @@ progress:
 
 - **Project:** Climate Pulse — Multi-source EU weather aggregation pipeline
 - **Core value:** End-to-end multi-source meteo pipeline (ARPA, ECMWF, NOAA, Copernicus) → TimescaleDB → public API + dashboard. The whole chain or nothing.
-- **Current focus:** Phase 1 — Foundation Slice + Public Docs (end-to-end thinnest vertical slice + MkDocs on GitHub Pages live with `federicocalo.dev` footer)
+- **Current focus:** Phase 01 — foundation-slice-public-docs
 - **Target release:** v1.0.0, Q3 2026
 - **Mode:** Vertical MVP (each phase delivers an end-to-end user-visible capability)
 - **Granularity:** coarse (5 phases)
 
 ## Current Position
 
+Phase: 01 (foundation-slice-public-docs) — EXECUTING
+Plan: 1 of 5
+
 - **Phase:** 1 — Foundation Slice + Public Docs
 - **Plan:** none (planning has not started)
-- **Status:** Not started (roadmap just initialized)
+- **Status:** Executing Phase 01
 - **Progress:** Phase 0 of 5 complete `[▱▱▱▱▱] 0%`
 - **Next action:** Run `/gsd:plan-phase 1` to decompose Phase 1 into executable plans.
 
