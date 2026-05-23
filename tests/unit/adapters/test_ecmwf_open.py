@@ -61,11 +61,16 @@ def _make_synthetic_dataset(
     Creates 2 datasets mimicking the multi-typeOfLevel split (Pitfall B):
     - Dataset 1: heightAboveGround=2 variables (t2m, d2m, sp)
     - Dataset 2: heightAboveGround=10 variables (u10, v10, tp)
+
+    NOTE: GRIB files use DESCENDING latitude order (Assumption A7). Synthetic
+    datasets must also use descending lat order so that
+    .sel(latitude=slice(72, 35)) returns the expected subset.
     """
     if lats is None:
-        lats = [36.0, 36.25]
+        # Descending latitudes inside EU bbox — matches real GRIB structure
+        lats = [71.75, 36.0]
     if lons is None:
-        lons = [-24.75, -24.5]
+        lons = [-24.75, 44.75]
 
     lat_arr = np.array(lats, dtype="float32")
     lon_arr = np.array(lons, dtype="float32")
@@ -226,8 +231,9 @@ async def test_eu_bbox_applied_post_download():
     adapter = _make_adapter()
     window = _make_window()
 
-    # Build a dataset with global-ish coordinates to verify sel is called
-    global_lats = [80.0, 50.0, 10.0]  # includes out-of-EU lats
+    # Build a dataset with global-ish coordinates to verify sel is called.
+    # Latitudes MUST be descending (as in real GRIB) so that slice(72, 35) works correctly.
+    global_lats = [80.0, 50.0, 10.0]  # descending; includes out-of-EU lats
     global_lons = [-30.0, 0.0, 50.0]  # includes out-of-EU lons
     datasets = _make_synthetic_dataset(lats=global_lats, lons=global_lons)
 
