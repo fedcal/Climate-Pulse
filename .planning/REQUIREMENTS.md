@@ -5,7 +5,7 @@
 
 ## v1 Requirements
 
-Requirements per release v1.0.0 (target Q3 2026). Ogni requisito è mappato a esattamente una fase nella sezione Traceability.
+Requirements per release v1.0.0 (target Q3 2026). 67 requisiti totali. Ogni requisito è mappato a esattamente una fase nella sezione Traceability.
 
 ### Ingestion
 
@@ -148,18 +148,96 @@ Esplicitamente esclusi. Documentati per prevenire scope creep.
 
 ## Traceability
 
-Empty initially — popolata da roadmapper.
+Mapping requirement → phase. Each v1 requirement appears in exactly one phase.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ING-01 | TBD | Pending |
-| ... (all requirements) | TBD | Pending |
+| ING-01 | Phase 1 | Pending |
+| ING-02 | Phase 1 | Pending |
+| ING-03 | Phase 1 | Pending |
+| ING-04 | Phase 1 | Pending |
+| ING-05 | Phase 4 | Pending |
+| ING-06 | Phase 4 | Pending |
+| ING-07 | Phase 4 | Pending |
+| ING-08 | Phase 4 | Pending |
+| ING-09 | Phase 1 | Pending |
+| ING-10 | Phase 1 | Pending |
+| ING-11 | Phase 1 | Pending |
+| ING-12 | Phase 1 | Pending |
+| ING-13 | Phase 1 | Pending |
+| ING-14 | Phase 1 | Pending |
+| STO-01 | Phase 1 | Pending |
+| STO-02 | Phase 1 | Pending |
+| STO-03 | Phase 1 | Pending |
+| STO-04 | Phase 1 | Pending |
+| STO-05 | Phase 1 | Pending |
+| STO-06 | Phase 1 | Pending |
+| API-01 | Phase 2 | Pending |
+| API-02 | Phase 2 | Pending |
+| API-03 | Phase 2 | Pending |
+| API-04 | Phase 2 | Pending |
+| API-05 | Phase 2 | Pending |
+| API-06 | Phase 2 | Pending |
+| API-07 | Phase 4 | Pending |
+| API-08 | Phase 2 | Pending |
+| API-09 | Phase 2 | Pending |
+| API-10 | Phase 2 | Pending |
+| API-11 | Phase 2 | Pending |
+| API-12 | Phase 2 | Pending |
+| API-13 | Phase 2 | Pending |
+| DSH-01 | Phase 3 | Pending |
+| DSH-02 | Phase 3 | Pending |
+| DSH-03 | Phase 3 | Pending |
+| DSH-04 | Phase 3 | Pending |
+| DSH-05 | Phase 4 | Pending |
+| DSH-06 | Phase 3 | Pending |
+| DSH-07 | Phase 4 | Pending |
+| DSH-08 | Phase 5 | Pending |
+| DSH-09 | Phase 3 | Pending |
+| DSH-10 | Phase 3 | Pending |
+| DSH-11 | Phase 3 | Pending |
+| ALR-01 | Phase 5 | Pending |
+| ALR-02 | Phase 5 | Pending |
+| ALR-03 | Phase 5 | Pending |
+| ALR-04 | Phase 5 | Pending |
+| ALR-05 | Phase 5 | Pending |
+| OPS-01 | Phase 1 | Pending |
+| OPS-02 | Phase 4 | Pending |
+| OPS-03 | Phase 5 | Pending |
+| OPS-04 | Phase 2 | Pending |
+| OPS-05 | Phase 4 | Pending |
+| OPS-06 | Phase 5 | Pending |
+| OPS-07 | Phase 1 | Pending |
+| OPS-08 | Phase 1 | Pending |
+| OPS-09 | Phase 1 | Pending |
+| OPS-10 | Phase 2 | Pending |
+| DOC-01 | Phase 1 | Pending |
+| DOC-02 | Phase 1 | Pending |
+| DOC-03 | Phase 1 | Pending |
+| DOC-04 | Phase 2 | Pending |
+| DOC-05 | Phase 1 | Pending |
+| DOC-06 | Phase 5 | Pending |
+| DOC-07 | Phase 3 | Pending |
+| DOC-08 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 60 total
-- Mapped to phases: 0 (pending roadmapper)
-- Unmapped: 60
+
+- v1 requirements: **67 total** (ING 14 + STO 6 + API 13 + DSH 11 + ALR 5 + OPS 10 + DOC 8)
+- Mapped to phases: **67** (100% coverage)
+- Unmapped: 0
+- Note: the initial scaffold mentioned "60 requirements"; the actual category count is 67. All are mapped 1:1, no orphans, no duplicates.
+
+**Per-phase distribution:**
+
+| Phase | Count | Categories |
+|-------|-------|------------|
+| Phase 1 (Foundation Slice + Public Docs) | 24 | ING (10) + STO (6) + OPS (4) + DOC (4) |
+| Phase 2 (Public REST API) | 15 | API (12) + OPS (2) + DOC (1) |
+| Phase 3 (Angular Dashboard MVP) | 9 | DSH (8) + DOC (1) |
+| Phase 4 (Live Updates + Source Breadth) | 9 | ING (4) + API (1) + DSH (2) + OPS (2) |
+| Phase 5 (Alerts + Ops Hardening + v1.0 Release) | 10 | ALR (5) + DSH (1) + OPS (2) + DOC (2) |
+| **Total** | **67** | |
 
 ---
 *Requirements defined: 2026-05-23*
-*Last updated: 2026-05-23 after initial definition*
+*Traceability populated by roadmapper: 2026-05-23*
