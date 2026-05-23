@@ -1,0 +1,57 @@
+[project]
+name = "climate-pulse"
+version = "0.1.0"
+description = "Multi-source EU weather aggregation pipeline"
+requires-python = ">=3.12,<3.13"
+readme = "README.md"
+license = { text = "MIT" }
+
+[tool.uv.workspace]
+members = ["apps/api", "apps/worker", "packages/core", "packages/migrations"]
+
+[dependency-groups]
+dev = [
+    "pytest==8.3.*",
+    "pytest-asyncio==1.3.*",
+    "pytest-cov==7.1.*",
+    "hypothesis==6.152.*",
+    "testcontainers[postgres]==4.14.*",
+    "fakeredis>=2.23",
+    "vcrpy==8.1.*",
+    "pytest-recording",
+    "respx>=0.21",
+    "ruff==0.15.*",
+    "pyright==1.1.*",
+    "pre-commit==4.6.*",
+    "mkdocs-material==9.7.*",
+    "mkdocstrings[python]==1.0.*",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "N"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106"]
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "basic"
+
+[[tool.pyright.executionEnvironments]]
+root = "packages/core"
+typeCheckingMode = "strict"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "--cov=packages --cov=apps --cov-report=xml --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["packages", "apps"]
+
+[tool.coverage.report]
+omit = ["*/tests/*", "*/__init__.py"]

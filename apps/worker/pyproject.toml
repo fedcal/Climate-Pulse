@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "climatepulse-worker"
+version = "0.1.0"
+description = "Climate Pulse Celery worker — ingestion, normalization, backfill CLI"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "celery[redis]==5.6.3",
+    "redis<6.0",
+    "climatepulse-core",
+    "ecmwf-opendata==0.3.*",
+    "cfgrib==0.9.15.*",
+    "xarray==2026.4.*",
+    "numpy>=2.1",
+]
+
+[tool.uv.sources]
+climatepulse-core = { workspace = true }

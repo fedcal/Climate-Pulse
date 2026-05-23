@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+*.egg
+
+# uv — keep uv.lock in git (uv recommendation)
+# NOTE: do NOT add uv.lock here
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# MkDocs
+site/
+
+# Environment files — gitignore .env and variants, but NOT .env.example
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# GRIB scratch files (never persist in git)
+*.grib
+*.grib2
+*.idx
+
+# Snapshot dev volume (Docker-managed)
+snapshots/
+
+# Type stub caches
+.mypy_cache/
+.pyright/
+pyrightconfig.json

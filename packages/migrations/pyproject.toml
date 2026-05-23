@@ -1,0 +1,15 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "climatepulse-migrations"
+version = "0.1.0"
+description = "Climate Pulse database migrations — Alembic + TimescaleDB DDL"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "alembic==1.18.*",
+    "sqlalchemy-timescaledb==0.4.*",
+    "asyncpg==0.31.*",
+    "sqlalchemy[asyncio]==2.0.*",
+]
