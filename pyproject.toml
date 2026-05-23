@@ -1,0 +1,46 @@
+[project]
+name = "climate-pulse"
+version = "0.1.0"
+description = "Multi-source EU weather aggregation pipeline"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Federico", email = "fedcal01@gmail.com" }]
+
+[tool.uv.workspace]
+members = ["packages/core", "packages/migrations"]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.3",
+    "pytest-asyncio>=1.3",
+    "pytest-cov>=7.1",
+    "hypothesis>=6.152",
+    "testcontainers[postgres]>=4.14",
+    "vcrpy>=8.1",
+    "respx>=0.21",
+    "ruff>=0.15",
+    "pyright>=1.1.409",
+    "pre-commit>=4.0",
+    "mkdocs-material>=9.7",
+    "mkdocstrings[python]>=1.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = [
+    "integration: requires Docker for testcontainers TimescaleDB",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"

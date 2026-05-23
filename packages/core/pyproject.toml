@@ -1,0 +1,20 @@
+[project]
+name = "climatepulse-core"
+version = "0.1.0"
+description = "Climate Pulse core domain models, adapters, normalizer, storage writer"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+
+dependencies = [
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncpg>=0.30",
+    "sqlalchemy-timescaledb>=0.4",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["climatepulse_core"]
