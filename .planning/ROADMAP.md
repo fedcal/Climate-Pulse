@@ -24,13 +24,14 @@ End-to-end multi-source meteo pipeline: aggregate public EU sources (ARPA, ECMWF
 **Goal:** Validate the entire architectural spine end-to-end with the thinnest possible vertical slice, and ship public documentation from day one.
 **Mode:** mvp
 **Depends on:** Nothing (first phase)
-**Requirements:** ING-01, ING-02, ING-03, ING-04, ING-09, ING-10, ING-11, ING-12, ING-13, ING-14, STO-01, STO-02, STO-03, STO-04, STO-05, STO-06, OPS-01, OPS-07, OPS-08, OPS-09, DOC-01, DOC-02, DOC-03, DOC-05
+**Requirements:** ING-01, ING-02, ING-03, ING-04, ING-09, ING-10, ING-11, ING-12, ING-13, ING-14, STO-01, STO-02, STO-03, STO-04, STO-05, STO-06, OPS-01, OPS-07, OPS-08, OPS-09, DOC-01, DOC-02, DOC-03, DOC-05, API-10
 **Success Criteria** (what must be TRUE):
   1. A self-hoster can run `docker compose up` on a fresh machine and within 10 minutes have TimescaleDB ingesting real observations from ARPA Emilia-Romagna and ECMWF Open Data (raw + hourly continuous aggregate populated).
   2. A developer can run `climatepulse backfill arpae --from 2026-05-01 --to 2026-05-07` and verify idempotent rows in the `observations` hypertable (re-running the command produces zero duplicates).
   3. The MkDocs Material documentation site is live on GitHub Pages at the project URL, auto-deployed on every push to `main`, and every page shows a `federicocalo.dev` clickable footer.
   4. A reader of the docs can follow the quickstart page to bring up the stack and run their first `psql` query against the hypertable.
   5. CI (GitHub Actions) blocks any PR that breaks pytest, ruff, pyright, or leaks a secret detected by gitleaks.
+  6. The /healthz endpoint returns 200 with {"status":"ok"} on container start and /readyz returns 200 with {"status":"ready"} once TimescaleDB, Redis and Celery worker are all healthy (D-14 anticipation of API-10).
 **Plans:** 2/5 plans executed
 Plans:
 - [x] 01-01-PLAN.md — uv workspace scaffold + MkDocs Material site live on GitHub Pages + CI gates (DOC-01/02/03/05 + OPS-07/08/09)
@@ -44,7 +45,7 @@ Plans:
 **Goal:** Make the ingested data publicly queryable through a versioned, documented, rate-limited REST API — the integration surface external researchers and downstream tooling will consume.
 **Mode:** mvp
 **Depends on:** Phase 1
-**Requirements:** API-01, API-02, API-03, API-04, API-05, API-06, API-08, API-09, API-10, API-11, API-12, API-13, OPS-04, OPS-10, DOC-04
+**Requirements:** API-01, API-02, API-03, API-04, API-05, API-06, API-08, API-09, API-11, API-12, API-13, OPS-04, OPS-10, DOC-04
 **Success Criteria** (what must be TRUE):
   1. A researcher can call `GET /v1/observations?station_id=...&variable=air_temperature&start=...&end=...` and receive a paginated, source-attributed, quality-flagged JSON response in under 1s P95 for a 30-day window (CAGG-routed).
   2. A data scientist can stream a multi-year Parquet export of one variable for one station via `GET /v1/observations?format=parquet` without the API process exceeding 200MB RSS.

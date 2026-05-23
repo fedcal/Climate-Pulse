@@ -181,7 +181,7 @@ Mapping requirement → phase. Each v1 requirement appears in exactly one phase.
 | API-07 | Phase 4 | Pending |
 | API-08 | Phase 2 | Pending |
 | API-09 | Phase 2 | Pending |
-| API-10 | Phase 2 | Pending |
+| API-10 | Phase 1 | Pending |
 | API-11 | Phase 2 | Pending |
 | API-12 | Phase 2 | Pending |
 | API-13 | Phase 2 | Pending |
@@ -231,12 +231,14 @@ Mapping requirement → phase. Each v1 requirement appears in exactly one phase.
 
 | Phase | Count | Categories |
 |-------|-------|------------|
-| Phase 1 (Foundation Slice + Public Docs) | 24 | ING (10) + STO (6) + OPS (4) + DOC (4) |
-| Phase 2 (Public REST API) | 15 | API (12) + OPS (2) + DOC (1) |
+| Phase 1 (Foundation Slice + Public Docs) | 25 | ING (10) + STO (6) + API (1) + OPS (4) + DOC (4) |
+| Phase 2 (Public REST API) | 14 | API (11) + OPS (2) + DOC (1) |
 | Phase 3 (Angular Dashboard MVP) | 9 | DSH (8) + DOC (1) |
 | Phase 4 (Live Updates + Source Breadth) | 9 | ING (4) + API (1) + DSH (2) + OPS (2) |
 | Phase 5 (Alerts + Ops Hardening + v1.0 Release) | 10 | ALR (5) + DSH (1) + OPS (2) + DOC (2) |
 | **Total** | **67** | |
+
+*Updated 2026-05-23 per Phase 1 CONTEXT D-14: API-10 (/healthz + /readyz) anticipated to Phase 1 to enable Walking Skeleton acceptance demo.*
 
 ---
 *Requirements defined: 2026-05-23*
