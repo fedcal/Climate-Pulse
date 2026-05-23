@@ -1,0 +1,169 @@
+name: climate-pulse
+
+# Climate Pulse — Docker Compose v2 stack (OPS-01)
+#
+# Services:
+#   timescale  — TimescaleDB 2.17 on PostgreSQL 16 (pinned per Pitfall E)
+#   redis      — Redis 7.4 broker + results + rate-limit cache
+#   migrate    — One-shot Alembic migration runner (exits 0 on success)
+#   api        — FastAPI minimal app (Phase 1: /healthz + /readyz only)
+#   worker     — Celery worker consuming ingest/normalize/alerts/dlq queues (ING-11)
+#   beat       — Celery Beat singleton (DO NOT scale > 1 — see Pitfall #6 below)
+#
+# Network topology: single default bridge network (Claude's discretion per CONTEXT.md).
+# All service-to-service communication uses Docker DNS names (e.g. timescale:5432).
+# Only the api service exposes a port publicly (8000).
+#
+# Usage:
+#   cp .env.example .env        # fill in POSTGRES_PASSWORD + any overrides
+#   docker compose -f infra/compose.yaml up -d --build
+#   docker compose -f infra/compose.yaml ps    # all services should be Up (healthy) within 5min
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # TimescaleDB — time-series storage for observations + gridded_observations
+  # ---------------------------------------------------------------------------
+  timescale:
+    image: timescale/timescaledb:2.17.2-pg16   # pinned per Pitfall E (never use :latest)
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    # Do NOT expose ports publicly — use `docker compose exec timescale psql` for access
+    # (documented in quickstart; prevents TimescaleDB from being reachable on host network)
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Redis — Celery broker (DB0) + results (DB1) + rate-limit (DB2) + ETag (DB3)
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    # Do NOT expose ports publicly — internal network only (T-05-04 threat mitigation)
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # migrate — one-shot Alembic migration runner
+  # Must complete successfully before api and worker start (BLOCKER 4 fix).
+  # ---------------------------------------------------------------------------
+  migrate:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.worker   # reuses worker image (has alembic + asyncpg)
+    command:
+      - "uv"
+      - "run"
+      - "alembic"
+      - "-c"
+      - "packages/migrations/alembic.ini"
+      - "upgrade"
+      - "head"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@timescale:5432/${POSTGRES_DB}
+    depends_on:
+      timescale:
+        condition: service_healthy
+    restart: "no"   # one-shot task; exit 0 = success, non-0 = failure
+
+  # ---------------------------------------------------------------------------
+  # api — FastAPI minimal app exposing /healthz + /readyz (Phase 1, D-14)
+  # ---------------------------------------------------------------------------
+  api:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.api
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@timescale:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379
+      ENVIRONMENT: production
+    ports:
+      - "8000:8000"   # ONLY service with public port (T-05-05 mitigation)
+    depends_on:
+      timescale:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully   # schema must be in place before api opens connections
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # worker — Celery worker consuming all 4 queues (ING-11)
+  # ---------------------------------------------------------------------------
+  worker:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.worker
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@timescale:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379
+      SNAPSHOT_DIR: /var/lib/climatepulse/snapshots
+    volumes:
+      - snapshots_data:/var/lib/climatepulse/snapshots   # D-15 snapshot volume mount
+    depends_on:
+      timescale:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully   # schema must be in place before writer inserts
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # beat — Celery Beat scheduler (SINGLETON — NEVER scale > 1)
+  #
+  # CRITICAL: deploy.replicas: 1 (Pitfall #6 — Research.md lines 1278-1281).
+  # Scaling beat to 2+ instances causes:
+  #   - ARPA Emilia-Romagna gets 2× requests per 15-minute window (politeness violation)
+  #   - gridded_observations gets duplicate ECMWF rows
+  #   - DLQ fills with false-positive schema violations
+  # In docker compose mode, rely on this comment + the deploy.replicas directive below.
+  # In Docker Swarm mode, deploy.replicas: 1 is enforced by the orchestrator.
+  # ---------------------------------------------------------------------------
+  beat:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.worker   # SAME image as worker
+    command:
+      - "uv"
+      - "run"
+      - "celery"
+      - "-A"
+      - "climatepulse_worker.celery_app"
+      - "beat"
+      - "--loglevel=INFO"
+    environment:
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@timescale:5432/${POSTGRES_DB}
+    depends_on:
+      redis:
+        condition: service_healthy
+      worker:
+        condition: service_started   # don't gate on worker healthy — beat can start independently
+    restart: unless-stopped
+    deploy:
+      replicas: 1   # DO NOT scale beat > 1 (Pitfall #6 — duplicate schedule entries)
+
+# ---------------------------------------------------------------------------
+# Named volumes
+# ---------------------------------------------------------------------------
+volumes:
+  timescale_data:
+  redis_data:
+  snapshots_data:   # Docker volume for JSON-LD snapshot fallback files (D-15)
