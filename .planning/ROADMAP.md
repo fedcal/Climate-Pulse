@@ -52,7 +52,14 @@ Plans:
   3. A consumer hitting `GET /v1/sources/status` sees per-source `last_successful_ingest_at`, freshness, and error rate — sufficient to decide whether to trust a query at a given moment.
   4. Rate limiting returns HTTP 429 with `X-RateLimit-*` headers when defaults (60/min stations, 30/min observations, 10/min export) are exceeded, and the limit is shared correctly across multiple API workers via Redis.
   5. The OpenAPI 3.1 spec is browsable at `/docs` (Swagger) and `/redoc`, the published mkdocstrings API reference renders without errors, and all access logs truncate client IPs (/24 v4, /48 v6) before persistence.
-**Plans:** TBD
+**Plans:** 6 plans
+Plans:
+- [ ] 02-01-PLAN.md — Foundation: settings + middleware (CORS/GZip/RequestID/GDPR IP) + HMAC cursor + ProblemDetail + main.py wiring
+- [ ] 02-02-PLAN.md — WMO variable dictionary completion (D-API-17: B04001-B06 drop, B07031 elevation, B13215 quality)
+- [ ] 02-03-PLAN.md — Stations + Meta + Sources routers (`/v1/stations`, `/v1/meta/variables`, `/v1/sources/status` always-200)
+- [ ] 02-04-PLAN.md — Observations router with resolution resolver + cursor pagination + per-row provenance/quality
+- [ ] 02-05-PLAN.md — Exports streaming (CSV/JSON/Parquet) + slowapi rate-limit + OpenAPI 3.1 enrichment
+- [ ] 02-06-PLAN.md — Observability (OTel + structlog + Prometheus /metrics) + DOC-04 mkdocstrings docs + OPS-10 privacy/runbook + acceptance checkpoint
 **UI hint:** no
 
 ### Phase 3: Angular Dashboard MVP
