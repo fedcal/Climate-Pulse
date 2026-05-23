@@ -29,6 +29,8 @@ Climate Pulse è una pipeline open-source che aggrega dati meteorologici da font
 - [ ] Scraping rispettoso (User-Agent identificato, rate limit conservative, cache HTTP, fallback snapshot statici, compliance robots.txt)
 - [ ] Alert configurabili (webhook + email) per soglie variabili (temperatura, vento, precipitazioni) per location
 - [ ] Documentazione MkDocs + community setup guide
+- [ ] **GitHub Pages documentation** pubblicata fin dalla v0.1 (MkDocs Material → gh-pages, GitHub Action di build/deploy automatico)
+- [ ] **Footer dashboard + footer docs** con attribuzione `federicocalo.dev` (link cliccabile) presente su ogni pagina del progetto
 - [ ] Deploy self-hosted via Docker Compose (timescale + redis + api + worker + dashboard)
 
 ### Out of Scope
@@ -63,6 +65,8 @@ Climate Pulse è una pipeline open-source che aggrega dati meteorologici da font
 - **Deploy**: self-hosted Docker Compose only in v1.0 — niente K8s, niente cloud-native
 - **Timeline**: rilascio v1.0.0 previsto Q3 2026
 - **Politeness scraping**: rate limit conservative, snapshot fallback, identificazione User-Agent obbligatori per fonti ARPA
+- **Attribuzione obbligatoria**: footer `federicocalo.dev` su dashboard Angular e documentazione GitHub Pages — presente in ogni release a partire dalla v0.1
+- **Docs pubbliche da subito**: documentazione MkDocs Material pubblicata su GitHub Pages fin dalla v0.1 (no "docs in fase successiva")
 
 ## Key Decisions
 
@@ -78,6 +82,8 @@ Climate Pulse è una pipeline open-source che aggrega dati meteorologici da font
 | License MIT | Filosofia open-data, massima riusabilità community | ✓ Good |
 | Self-hosted Docker Compose only (v1.0) | Zero cloud budget, deploy comunità open-data, single-node sufficient | — Pending |
 | Public API senza autenticazione (rate-limit IP-based) | Filosofia open-data, API key opzionale solo in v1.0 | — Pending |
+| Docs su GitHub Pages fin dalla v0.1 (MkDocs Material + GH Action) | Progetto open-source vive anche di docs scoperte da Google — niente "docs dopo", parte subito | ✓ Good |
+| Footer `federicocalo.dev` su dashboard + docs | Attribuzione autore richiesta in ogni release; deve essere in ogni pagina (dashboard Angular layout + MkDocs theme footer) | ✓ Good |
 
 ## Evolution
 
