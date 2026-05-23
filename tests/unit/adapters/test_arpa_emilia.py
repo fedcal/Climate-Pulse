@@ -185,8 +185,11 @@ def test_adapter_registered():
     import climatepulse_core.adapters.arpa_emilia
 
     importlib.reload(climatepulse_core.adapters.arpa_emilia)
+    # After reload, the class in the module may differ from the one imported at top of file.
+    # Verify by source_id and class name instead.
     adapter = get_adapter("arpa_emilia")
-    assert isinstance(adapter, ArpaeEmiliaAdapter)
+    assert adapter.__class__.__name__ == "ArpaeEmiliaAdapter"
+    assert adapter.source_id == "arpa_emilia"
 
 
 # ---------------------------------------------------------------------------
