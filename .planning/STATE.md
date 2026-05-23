@@ -3,38 +3,46 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Release
 status: executing
-last_updated: "2026-05-23T10:23:18.455Z"
+last_updated: "2026-05-23T16:30:00.000Z"
 progress:
-  total_phases: 1
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 5
+  completed_phases: 1
+  total_plans: 5
+  completed_plans: 5
+  percent: 20
 ---
 
 # STATE: Climate Pulse
 
-**Last updated:** 2026-05-23 (initialization)
+**Last updated:** 2026-05-23 (Phase 1 complete)
 
 ## Project Reference
 
 - **Project:** Climate Pulse — Multi-source EU weather aggregation pipeline
 - **Core value:** End-to-end multi-source meteo pipeline (ARPA, ECMWF, NOAA, Copernicus) → TimescaleDB → public API + dashboard. The whole chain or nothing.
-- **Current focus:** Phase 01 — foundation-slice-public-docs
+- **Current focus:** Phase 02 — Public REST API
 - **Target release:** v1.0.0, Q3 2026
 - **Mode:** Vertical MVP (each phase delivers an end-to-end user-visible capability)
 - **Granularity:** coarse (5 phases)
 
 ## Current Position
 
-Phase: 01 (foundation-slice-public-docs) — EXECUTING
-Plan: 1 of 5
+Phase: 02 (Public REST API) — PENDING
+Plan: not yet planned
 
-- **Phase:** 1 — Foundation Slice + Public Docs
+- **Phase:** 2 — Public REST API
 - **Plan:** none (planning has not started)
-- **Status:** Executing Phase 01
-- **Progress:** Phase 0 of 5 complete `[▱▱▱▱▱] 0%`
-- **Next action:** Run `/gsd:plan-phase 1` to decompose Phase 1 into executable plans.
+- **Status:** Phase 1 PASSED (acceptance demo verified end-to-end; user approved 3 GitHub-side checks on 2026-05-23)
+- **Progress:** Phase 1 of 5 complete `[█▱▱▱▱] 20%`
+- **Next action:** Run `/gsd:discuss-phase 2` (or `/gsd:plan-phase 2`) for Phase 2 (FastAPI public API).
+
+## Phase 1 Recap
+
+- 5 plans executed across 4 waves (~3.5h executor time, ~30 file Python/Docker/CI/docs)
+- Acceptance demo PASSED: 68k ARPAE obs + 1.5M ECMWF grid obs, idempotent backfill, /healthz + /readyz green, D-22 libeccodes split validated
+- 4 bugfix durante demo: Dockerfile.worker two-pass install, repos.py JSONB serialize, backfill.py asyncpg URL strip, writer.py dedup pre-COPY
+- Repo live: github.com/fedcal/Climate-Pulse, docs: fedcal.github.io/Climate-Pulse, footer attribuzione `federicocalo.dev` verbatim
+- VERIFICATION.md: `status: passed` (6/6 must-haves + 3/3 human checks user-approved)
 
 ## Performance Metrics
 

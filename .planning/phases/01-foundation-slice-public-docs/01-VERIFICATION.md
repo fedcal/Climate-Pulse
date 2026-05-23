@@ -1,26 +1,23 @@
 ---
 phase: 01-foundation-slice-public-docs
 verified: 2026-05-23T16:00:00Z
-status: human_needed
-score: 6/6 must-haves verified (roadmap success criteria)
+status: passed
+score: 6/6 must-haves verified + 3/3 human checks approved by user 2026-05-23
 overrides_applied: 0
-human_verification:
-  - test: "Confirm MkDocs site is live at fedcal.github.io/Climate-Pulse"
-    expected: "Homepage loads, every page shows footer 'Climate Pulse · MIT License · federicocalo.dev' as a clickable link, nav has Home/Quickstart/Scraping Policy"
-    why_human: "GitHub Pages enablement requires manual Settings > Pages > Source = GitHub Actions; live site visit cannot be automated"
-  - test: "Confirm docs deploy workflow ran green after pages source was enabled"
-    expected: "Actions tab shows Deploy Documentation workflow succeeded; fedcal.github.io/Climate-Pulse is reachable"
-    why_human: "Cannot access GitHub Actions remote runner or live Pages URL from local verification"
-  - test: "Confirm CI blocks a PR containing a fake secret (gitleaks gate)"
-    expected: "Opening a throwaway PR with a hardcoded secret (e.g. API_KEY = 'ghp_...') causes the gitleaks-action@v2 step to fail and block merge"
-    why_human: "Cannot trigger a real GitHub Actions CI run from local verification"
+human_verification_approved:
+  - test: "MkDocs site live at fedcal.github.io/Climate-Pulse with verbatim footer"
+    status: approved
+  - test: "Docs deploy workflow green on GitHub Actions"
+    status: approved
+  - test: "CI gitleaks gate blocks secret-leaking PR"
+    status: approved
 ---
 
 # Phase 1: Foundation Slice + Public Docs — Verification Report
 
 **Phase Goal:** Validate the entire architectural spine end-to-end with the thinnest possible vertical slice, and ship public documentation from day one.
 **Verified:** 2026-05-23
-**Status:** human_needed
+**Status:** passed (user approved 3 human checks 2026-05-23)
 **Re-verification:** No — initial verification
 
 ---
