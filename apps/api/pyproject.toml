@@ -10,6 +10,9 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
     "fastapi==0.136.*",
     "uvicorn[standard]==0.47.*",
+    "asyncpg==0.31.*",
+    "redis[hiredis]<6.0",
+    "pydantic-settings>=2.5",
     "climatepulse-core",
 ]
 

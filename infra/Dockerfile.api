@@ -1,0 +1,39 @@
+# Climate Pulse — FastAPI minimal API (Phase 1: /healthz + /readyz only)
+#
+# D-22: This image MUST NOT install libeccodes. cfgrib lives in the worker only.
+# The API container stays slim — it does not need to parse GRIB files.
+#
+# Build context: project root (docker build -f infra/Dockerfile.api .)
+
+FROM python:3.12.7-slim-bookworm
+
+WORKDIR /app
+
+# Install curl for the HEALTHCHECK CMD (no other system deps needed per D-22)
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv for fast, reproducible package installation
+RUN pip install --no-cache-dir "uv==0.4.*"
+
+# Copy workspace lockfiles and package manifests first (leverage Docker layer cache)
+COPY pyproject.toml uv.lock ./
+
+# Copy only the packages needed by the API container
+COPY packages/core/ ./packages/core/
+COPY apps/api/ ./apps/api/
+
+# Install the api package and its dependencies only (NOT worker packages)
+# --no-dev excludes test tools from the production image
+RUN uv sync --frozen --package climatepulse-api --no-dev
+
+# Expose the application port
+EXPOSE 8000
+
+# Liveness check: /healthz must respond without dependencies
+HEALTHCHECK --interval=10s --timeout=5s --retries=5 --start-period=15s \
+    CMD curl -fsS http://localhost:8000/healthz || exit 1
+
+# Production command: uvicorn served from uv virtualenv
+CMD ["uv", "run", "uvicorn", "climatepulse_api.main:app", \
+     "--host", "0.0.0.0", "--port", "8000"]

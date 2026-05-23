@@ -1,0 +1,52 @@
+# Climate Pulse — Celery worker (ingestion + Beat scheduler)
+#
+# D-21: libeccodes0 + libeccodes-tools are REQUIRED in this image for cfgrib GRIB decoding.
+# D-22: These are present in the WORKER image ONLY — not in Dockerfile.api.
+#
+# This image is used for BOTH the worker service (celery worker) AND the
+# beat service (celery beat) in compose.yaml — they share the same image,
+# differentiated by the Docker CMD override.
+#
+# Build context: project root (docker build -f infra/Dockerfile.worker .)
+
+FROM python:3.12.7-slim-bookworm
+
+WORKDIR /app
+
+# System dependencies — install FIRST as a separate Docker layer for cache efficiency.
+# libeccodes0 + libeccodes-tools: required for cfgrib GRIB2 parsing (D-21).
+# curl: used by the HEALTHCHECK CMD.
+# apt-get cleanup removes package lists to reduce image size.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libeccodes0 \
+    libeccodes-tools \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv for fast, reproducible package installation
+RUN pip install --no-cache-dir "uv==0.4.*"
+
+# Copy workspace lockfiles and package manifests first (leverage Docker layer cache)
+COPY pyproject.toml uv.lock ./
+
+# Copy only the packages needed by the worker container
+COPY packages/core/ ./packages/core/
+COPY packages/migrations/ ./packages/migrations/
+COPY apps/worker/ ./apps/worker/
+
+# Install the worker package and its dependencies only
+# --no-dev excludes test tools from the production image
+RUN uv sync --frozen --package climatepulse-worker --no-dev
+
+# Healthcheck: verify at least one Celery worker process is responding
+HEALTHCHECK --interval=15s --timeout=10s --retries=5 --start-period=30s \
+    CMD celery -A climatepulse_worker.celery_app inspect ping -t 5 || exit 1
+
+# Default CMD: start a Celery worker consuming from all 4 queues per ING-11
+# The beat service in compose.yaml overrides this with the celery beat command.
+CMD ["uv", "run", "celery", \
+     "-A", "climatepulse_worker.celery_app", \
+     "worker", \
+     "-Q", "ingest,normalize,alerts,dlq", \
+     "-c", "4", \
+     "--loglevel=INFO"]
