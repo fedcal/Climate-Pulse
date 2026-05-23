@@ -106,8 +106,11 @@ class IdempotentWriter:
 
         station_map = self._stations.get(adapter.source_id, {})
 
-        # Build tuples for COPY
-        records: list[tuple] = []
+        # Build tuples for COPY, deduping by composite PK (station_id, variable_id,
+        # observed_at, source_id) — adapters may emit duplicate observations within
+        # a single batch (e.g., overlapping snapshot + realtime windows) which would
+        # break ON CONFLICT DO UPDATE ("cannot affect row a second time"). Last value wins.
+        records_by_pk: dict[tuple, tuple] = {}
         skipped = 0
         for obs in observations:
             variable_pk = self._variables.get(obs.wmo_code)
@@ -130,14 +133,16 @@ class IdempotentWriter:
                 skipped += 1
                 continue
 
-            records.append((
+            pk = (station_pk, variable_pk, obs.observed_at, source_pk)
+            records_by_pk[pk] = (
                 obs.observed_at,   # TIMESTAMPTZ
                 station_pk,        # BIGINT
                 variable_pk,       # SMALLINT
                 source_pk,         # SMALLINT
                 obs.value,         # DOUBLE PRECISION
                 int(obs.qc_flag),  # SMALLINT
-            ))
+            )
+        records: list[tuple] = list(records_by_pk.values())
 
         if not records:
             return 0
@@ -208,7 +213,9 @@ class IdempotentWriter:
             )
             return 0
 
-        records: list[tuple] = []
+        # Dedup by gridded PK (lat_idx, lon_idx, variable_id, valid_at, source_id) — same
+        # rationale as station batch (overlapping windows from adapter).
+        records_by_pk: dict[tuple, tuple] = {}
         skipped = 0
         for obs in observations:
             variable_pk = self._variables.get(obs.wmo_code)
@@ -228,7 +235,8 @@ class IdempotentWriter:
                 skipped += 1
                 continue
 
-            records.append((
+            pk = (obs.lat_idx, obs.lon_idx, variable_pk, obs.observed_at, source_pk)
+            records_by_pk[pk] = (
                 obs.observed_at,                  # valid_at TIMESTAMPTZ
                 obs.init_time or obs.observed_at,  # init_time TIMESTAMPTZ
                 obs.step_h or 0,                  # step_h SMALLINT
@@ -240,7 +248,8 @@ class IdempotentWriter:
                 source_pk,                        # source_id SMALLINT
                 obs.value,                        # value DOUBLE PRECISION
                 int(obs.qc_flag),                 # qc_flag SMALLINT
-            ))
+            )
+        records: list[tuple] = list(records_by_pk.values())
 
         if not records:
             return 0

@@ -325,7 +325,14 @@ def main(argv: list[str] | None = None) -> int:
         db_pool = None
         redis_client = None
         try:
-            db_pool = await asyncpg.create_pool(db_url)
+            # Strip +asyncpg driver prefix that asyncpg.create_pool doesn't accept
+            # (SQLAlchemy uses "postgresql+asyncpg://" but asyncpg wants "postgresql://")
+            asyncpg_url = (
+                "postgresql://" + db_url[len("postgresql+asyncpg://") :]
+                if db_url.startswith("postgresql+asyncpg://")
+                else db_url
+            )
+            db_pool = await asyncpg.create_pool(asyncpg_url)
             redis_client = aioredis.Redis.from_url(redis_url)
 
             total = await run_backfill(

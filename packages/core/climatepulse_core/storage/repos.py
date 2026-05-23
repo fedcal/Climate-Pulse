@@ -8,6 +8,8 @@ All operations use ON CONFLICT DO UPDATE for idempotency — safe to call
 repeatedly on adapter startup or after cache miss.
 """
 
+import json
+
 import asyncpg
 
 from climatepulse_core.domain.models import Source, Station, Variable
@@ -103,7 +105,7 @@ class MetadataRepo:
                 station.lat,
                 station.lon,
                 station.elevation_m,
-                station.metadata or {},
+                json.dumps(station.metadata or {}),
             )
         return int(pk)
 

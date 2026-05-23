@@ -29,14 +29,20 @@ RUN pip install --no-cache-dir "uv==0.4.*"
 # Copy workspace lockfiles and package manifests first (leverage Docker layer cache)
 COPY pyproject.toml uv.lock ./
 
-# Copy only the packages needed by the worker container
+# Copy all workspace members so uv sync can resolve the workspace.
+# apps/api is included but its dependencies are NOT installed (only worker + migrations
+# are required for runtime; api runs in its own slim container).
 COPY packages/core/ ./packages/core/
 COPY packages/migrations/ ./packages/migrations/
 COPY apps/worker/ ./apps/worker/
+COPY apps/api/ ./apps/api/
 
-# Install the worker package and its dependencies only
-# --no-dev excludes test tools from the production image
-RUN uv sync --frozen --package climatepulse-worker --no-dev
+# Install worker + migrations packages (worker image runs both worker and migrate services
+# per compose.yaml; migrate needs alembic from climatepulse-migrations).
+# Two passes because uv sync --package accepts only one package per invocation.
+# --no-dev excludes test tools from the production image; --inexact preserves prior installs.
+RUN uv sync --frozen --no-dev --package climatepulse-worker \
+    && uv sync --frozen --no-dev --inexact --package climatepulse-migrations
 
 # Healthcheck: verify at least one Celery worker process is responding
 HEALTHCHECK --interval=15s --timeout=10s --retries=5 --start-period=30s \
