@@ -365,6 +365,7 @@ dependencies = [
     { name = "pyrate-limiter" },
     { name = "redis" },
     { name = "sqlalchemy", extra = ["asyncio"] },
+    { name = "sqlalchemy-timescaledb" },
     { name = "structlog" },
     { name = "tenacity" },
 ]
@@ -380,6 +381,7 @@ requires-dist = [
     { name = "pyrate-limiter", specifier = "==4.1.*" },
     { name = "redis", specifier = "<6.0" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = "==2.0.*" },
+    { name = "sqlalchemy-timescaledb", specifier = ">=0.4" },
     { name = "structlog", specifier = "==25.5.*" },
     { name = "tenacity", specifier = "==9.1.*" },
 ]
@@ -391,6 +393,7 @@ source = { editable = "packages/migrations" }
 dependencies = [
     { name = "alembic" },
     { name = "asyncpg" },
+    { name = "climatepulse-core" },
     { name = "sqlalchemy", extra = ["asyncio"] },
     { name = "sqlalchemy-timescaledb" },
 ]
@@ -399,6 +402,7 @@ dependencies = [
 requires-dist = [
     { name = "alembic", specifier = "==1.18.*" },
     { name = "asyncpg", specifier = "==0.31.*" },
+    { name = "climatepulse-core", editable = "packages/core" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = "==2.0.*" },
     { name = "sqlalchemy-timescaledb", specifier = "==0.4.*" },
 ]
