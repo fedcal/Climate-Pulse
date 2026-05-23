@@ -17,5 +17,11 @@ dependencies = [
     "numpy>=2.1",
 ]
 
+[project.scripts]
+climatepulse = "climatepulse_worker.cli.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["climatepulse_worker"]
+
 [tool.uv.sources]
 climatepulse-core = { workspace = true }

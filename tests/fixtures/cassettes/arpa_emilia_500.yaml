@@ -1,0 +1,13 @@
+# respx stub — 500 Internal Server Error scenario
+# marker: respx-stub
+# record_mode: none
+version: 1
+interactions:
+  - request:
+      method: GET
+      url: https://dati-simc.arpae.it/opendata/osservati/meteo/realtime/realtime.jsonl
+    response:
+      status: 500
+      headers:
+        Content-Type: text/plain
+      body: "Internal Server Error"
