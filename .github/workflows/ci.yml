@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+
+    env:
+      PYTHONUNBUFFERED: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # gitleaks needs full history
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Set up Python 3.12.7
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.7"
+
+      - name: Install dependencies
+        run: uv sync --all-packages --all-groups
+
+      - name: Lint — ruff check
+        run: uv run ruff check .
+
+      - name: Format check — ruff format
+        run: uv run ruff format --check .
+
+      - name: Type check — pyright
+        run: uv run pyright
+
+      - name: Test + coverage — global gate 80%
+        run: uv run pytest -v --cov=packages --cov=apps --cov-report=xml --cov-fail-under=80
+
+      - name: Coverage — adapters gate 70%
+        continue-on-error: false
+        run: |
+          uv run pytest packages/core/climatepulse_core/adapters \
+            --cov=packages/core/climatepulse_core/adapters \
+            --cov-fail-under=70
+
+      - name: Secret scan — gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
